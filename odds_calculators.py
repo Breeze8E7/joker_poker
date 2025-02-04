@@ -1,11 +1,24 @@
 from base_classes import *
 import math
+from fractions import Fraction
 
-def base_combinations(deck):
+def odds(deck):
+    x = flush_combos_all(deck)
+    y = base_combinations(deck)
+    print (f"x = {x}, y = {y}")
+    if y == 0:
+        print("Error: No valid hands to calculate odds.")
+        return None
+    z = Fraction(x, y)
+    print (f"The odds of a flush are {z}")
+    return z
+
+def base_combinations(deck, hand_size=5):
     d = deck.deck_size
-    h = len(deck.hand)
+    h = hand_size
     if d <= 0 or h <= 0:
-        return "No valid hands"
+        print ("No valid hands")
+        return 0
     return math.comb(d, h)
 
 def pair_combinations(deck):
