@@ -65,3 +65,15 @@ class Deck:
     def reset_deck(self):
         self.deck_contents.extend(self.hand)
         self.hand.clear()
+
+    def remove_card(self, rank_name, suit):
+        rank = Rank[rank_name].value
+        for card in self.deck_contents[:]:
+            if card.rank == rank and card.suit == suit:
+                self.deck_contents.remove(card)
+                self.deck_size -= 1
+                self.rank_counts[Rank(rank)] -= 1
+                self.suit_counts[suit] -= 1
+                print(f"Successfully removed: {card.rank} of {card.suit}")
+                return
+        print(f"Card {rank_name} of {suit} not found!")
