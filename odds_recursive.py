@@ -1,4 +1,5 @@
-from base_classes import *
+from deck_classes import *
+from card_classes import *
 import math
 from fractions import Fraction
 from collections import Counter
@@ -39,7 +40,7 @@ def present_odds(deck, hand_size=5):
     for hand_type, count in hand_counts.items():
         odds_fraction = Fraction(count, possible_hands)
         odds_percent = (count / possible_hands) * 100
-        results.append(f"The odds of a {hand_type.replace('_', ' ')} are {odds_fraction}, or {odds_percent:.2f}%")
+        results.append(f"The odds of a {hand_type.replace('_', ' ')} are {odds_fraction}, or {odds_percent:.3f}%")
     print("\n".join(results))
     return results
 
@@ -86,9 +87,15 @@ def is_full_house(hand):
     return 0
 
 def is_flush(hand):
-    suit_counts = Counter(card.suit for card in hand)
-    for count in suit_counts.values():
-        if count == 5:
+    suit_counts = Counter()
+    for card in hand:
+        if isinstance(card.suit, tuple):
+            for suit in card.suit:
+                suit_counts[suit] +=1
+        else:
+            suit_counts[card.suit] +=1
+    for suit, count in suit_counts.items():
+        if count >= 5:
             return 1
     return 0
 
@@ -103,3 +110,4 @@ def is_straight(hand):
 
 def is_straight_flush(hand):
     return 1 if is_flush(hand) and is_straight(hand) else 0
+

@@ -1,30 +1,7 @@
 from enum import Enum
 import random
 from collections import Counter
-
-Suit = Enum("suit", ["heart", "diamond", "spade", "club"])
-Rank = Enum("rank", {
-    "ace": 1,
-    "two": 2,
-    "three": 3,
-    "four": 4,
-    "five": 5,
-    "six": 6,
-    "seven": 7,
-    "eight": 8,
-    "nine": 9,
-    "ten": 10,
-    "jack": 11,
-    "queen": 12,
-    "king": 13
-})
-
-
-class Card:
-    def __init__(self, rank, suit, title=None):
-        self.rank = rank.value
-        self.suit = suit
-        self.title = title
+from card_classes import *
 
 class Deck:
     def __init__(self):
@@ -37,7 +14,7 @@ class Deck:
     def create_basic_deck(self):
         for x in Rank:
             for y in Suit:
-                title = f"{x} of {y}"
+                title = "Basic"
                 card = Card(x, y, title)
                 self.deck_contents.append(card)
                 self.rank_counts[x] += 1
@@ -69,7 +46,7 @@ class Deck:
     def remove_card(self, rank_name, suit):
         rank = Rank[rank_name].value
         for card in self.deck_contents[:]:
-            if card.rank == rank and card.suit == suit:
+            if card.rank == rank and card.suit == suit and card.title == "Basic":
                 self.deck_contents.remove(card)
                 self.deck_size -= 1
                 self.rank_counts[Rank(rank)] -= 1
@@ -77,3 +54,17 @@ class Deck:
                 print(f"Successfully removed: {card.rank} of {card.suit}")
                 return
         print(f"Card {rank_name} of {suit} not found!")
+
+    def upgrade_card(self, rank_name, suit):
+        self.remove_card(rank_name, suit)
+        self.add_wild_joker(rank_name)
+
+    def add_wild_joker(self, rank_name):
+        rank = Rank[rank_name].value
+        new_joker = Wild_Joker(rank)
+        self.deck_contents.append(new_joker)
+        self.deck_size +=1
+        self.rank_counts[Rank(rank)] +=1
+        for suit in Suit:
+            self.suit_counts[suit] += 1
+        print(f"Successfully added: Wild {rank}")
