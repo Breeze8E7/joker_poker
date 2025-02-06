@@ -27,7 +27,13 @@ class Card:
         self.title = title
 
 class Wild_Joker(Card):
-    def __init__(self, rank, title="Joker"):
+    def __init__(self, rank, title="Wild Joker"):
         self.rank = rank
         self.suit = (Suit.club, Suit.diamond, Suit.heart, Suit.spade)
+        self.title = title
+
+class Jackson_Five(Card):
+    def __init__(self, suit, title="Jackson Five"):
+        self.rank = (Rank.five, Rank.jack)
+        self.suit = suit
         self.title = title

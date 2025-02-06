@@ -45,45 +45,92 @@ def present_odds(deck, hand_size=5):
     return results
 
 def is_pair(hand):
-    rank_counts = Counter(card.rank for card in hand)
-    for count in rank_counts.values():
+    rank_counts = Counter()
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            for rank in card.rank:
+                rank_counts[rank.value] +=1
+        else:
+            rank_counts[card.rank] +=1
+    for rank, count in rank_counts.items():
         if count == 2:
             return 1
     return 0
 
 def is_two_pair(hand):
-    rank_counts = Counter(card.rank for card in hand)
-    pair_count = 0
-    for count in rank_counts.values():
-        if count == 2:
-            pair_count += 1
-    return 1 if pair_count == 2 else 0
+    rank_counts = Counter()
+    joker_ranks = []
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            joker_ranks.append(card.rank)
+        else:
+            rank_counts[card.rank] +=1
+    pairs = sum(1 for count in rank_counts.values() if count >= 2)
+    for joker_rank_choices in combinations(joker_ranks, len(joker_ranks)):
+        temp_counts = rank_counts.copy()
+        for rank_tuple in joker_rank_choices:
+            for possible_rank in rank_tuple:
+                temp_counts[possible_rank.value] +=1
+        if sum(1 for count in temp_counts.values() if count >= 2) >= 2:
+            return 1
+    return 0
 
 def is_three_oak(hand):
-    rank_counts = Counter(card.rank for card in hand)
-    for count in rank_counts.values():
+    rank_counts = Counter()
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            for rank in card.rank:
+                rank_counts[rank.value] +=1
+        else:
+            rank_counts[card.rank] +=1
+    for rank, count in rank_counts.items():
         if count == 3:
             return 1
     return 0
 
 def is_four_oak(hand):
-    rank_counts = Counter(card.rank for card in hand)
-    for count in rank_counts.values():
+    rank_counts = Counter()
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            for rank in card.rank:
+                rank_counts[rank.value] +=1
+        else:
+            rank_counts[card.rank] +=1
+    for rank, count in rank_counts.items():
         if count == 4:
             return 1
     return 0
 
 def is_full_house(hand):
-    rank_counts = Counter(card.rank for card in hand)
-    has_three = False
-    has_pair = False
-    for count in rank_counts.values():
-        if count == 3:
-            has_three = True
-        elif count == 2:
-            has_pair = True
-        if has_three and has_pair:
-            return 1  
+    rank_counts = Counter()
+    joker_ranks = []
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            joker_ranks.append(card.rank)
+        else:
+            rank_counts[card.rank] += 1
+    three_rank = None
+    for rank, count in rank_counts.items():
+        if count >= 3:
+            three_rank = rank
+    if three_rank:
+        has_pair = any(count >= 2 for rank, count in rank_counts.items() if rank != three_rank)
+        if has_pair:
+            return 1
+    for joker_rank_choices in combinations(joker_ranks, len(joker_ranks)):
+        temp_counts = rank_counts.copy()
+        for rank_tuple in joker_rank_choices:
+            for possible_rank in rank_tuple:
+                temp_counts[possible_rank.value] += 1
+        three_rank = None
+        for rank, count in temp_counts.items():
+            if count >= 3:
+                three_rank = rank
+                break
+        if three_rank:
+            has_pair = any(count >= 2 for rank, count in temp_counts.items() if rank != three_rank)
+            if has_pair:
+                return 1
     return 0
 
 def is_flush(hand):
@@ -100,12 +147,28 @@ def is_flush(hand):
     return 0
 
 def is_straight(hand):
-    unique_ranks = sorted(set(card.rank for card in hand))
-    for i in range(len(unique_ranks) - 4):
-        if unique_ranks[i:i+5] == list(range(unique_ranks[i], unique_ranks[i]+5)):
+    unique_ranks = set()
+    joker_ranks = []
+    for card in hand:
+        if isinstance(card.rank, tuple):
+            joker_ranks.append(card.rank)
+        else:
+            unique_ranks.add(card.rank)
+    sorted_ranks = sorted(unique_ranks)
+    for i in range(len(sorted_ranks) - 4):
+        if sorted_ranks[i:i+5] == list(range(sorted_ranks[i], sorted_ranks[i]+5)):
             return 1
-    if set(unique_ranks) >= {1, 2, 3, 4, 5} or set(unique_ranks) >= {10, 11, 12, 13, 1}:
-        return 1
+    if not joker_ranks:
+        return 0
+    for joker_rank_choices in combinations(joker_ranks, len(joker_ranks)):
+        temp_ranks = unique_ranks.copy()
+        for rank_tuple in joker_rank_choices:
+            for possible_rank in rank_tuple:
+                temp_ranks.add(possible_rank.value)
+        sorted_ranks = sorted(temp_ranks)
+        for i in range(len(sorted_ranks) - 4):
+            if sorted_ranks[i:i+5] == list(range(sorted_ranks[i], sorted_ranks[i]+5)):
+                return 1
     return 0
 
 def is_straight_flush(hand):

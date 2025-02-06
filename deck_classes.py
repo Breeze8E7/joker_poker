@@ -68,3 +68,12 @@ class Deck:
         for suit in Suit:
             self.suit_counts[suit] += 1
         print(f"Successfully added: Wild {rank}")
+
+    def add_jackson_five(self, suit):
+        new_joker = Jackson_Five(suit)
+        self.deck_contents.append(new_joker)
+        self.deck_size +=1
+        self.suit_counts[suit] +=1
+        for rank in new_joker.rank:
+            self.rank_counts[rank.value] +=1
+        print(f"Successfully added Jackson Five of {suit}")
