@@ -57,7 +57,7 @@ class Deck:
 
     def upgrade_card(self, rank_name, suit):
         self.remove_card(rank_name, suit)
-        self.add_wild_joker(rank_name)
+        self.add_jackson_five(suit)
 
     def add_wild_joker(self, rank_name):
         rank = Rank[rank_name].value
